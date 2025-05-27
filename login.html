@@ -1,37 +1,35 @@
 <!DOCTYPE html>
-<html lang="as">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Sign Up - Assamese Chat</title>
+  <title>Login</title>
 </head>
 <body>
-  <h2>নতুন ইউজাৰ চাইন আপ কৰক</h2>
-  <input type="email" id="email" placeholder="ইমেইল দিয়ক" />
-  <input type="password" id="password" placeholder="পাছৱৰ্ড দিয়ক" />
-  <button id="signupBtn">সাইন আপ</button>
-  <p id="status"></p>
-  <p>আগতে সদস্য? <a href="login.html">লগইন কৰক</a></p>
+  <h2>Login</h2>
+  <input type="email" id="email" placeholder="Email" /><br>
+  <input type="password" id="password" placeholder="Password" /><br>
+  <button onclick="login()">Login</button>
+
+  <p id="message"></p>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-    import { firebaseConfig } from "./firebase-config.js";
+    import { auth } from './firebase-config.js';
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    document.getElementById("signupBtn").addEventListener("click", () => {
+    function login() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          document.getElementById("status").textContent = "সাইন আপ সফল! লগইন কৰক।";
-          window.location.href = "login.html";
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          document.getElementById("message").innerText = "Login Successful!";
+          window.location.href = "chat.html";
         })
-        .catch(error => {
-          document.getElementById("status").textContent = "Error: " + error.message;
+        .catch((error) => {
+          document.getElementById("message").innerText = error.message;
         });
-    });
+    }
+
+    window.login = login;
   </script>
 </body>
 </html>
