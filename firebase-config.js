@@ -1,13 +1,10 @@
-
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAgCrl78GwcFLpJ6pRDAvrVYkXkgcLHSkI",
-  authDomain: "assamchat-29eef.firebaseapp.com",
-  projectId: "assamchat-29eef",
-  storageBucket: "assamchat-29eef.appspot.com",
-  messagingSenderId: "686012350709",
-  appId: "1:686012350709:web:1ea7f5f0444a1a402a85bc",
-  measurementId: "G-GDPW28JVTF",
-  databaseURL: "https://assamchat-29eef-default-rtdb.firebaseio.com"
+// firebase-config.js
+export const firebaseConfig = {
+  apiKey: "AIzaSyDrbm99CHpokopa79mqcvJga_ZppJ4lujU",
+  authDomain: "assamesechat-8ce9b.firebaseapp.com",
+  projectId: "assamesechat-8ce9b",
+  storageBucket: "assamesechat-8ce9b.appspot.com",
+  messagingSenderId: "1000987239519",
+  appId: "1:1000987239519:web:cfe2845c8f3f066ab427ea",
+  measurementId: "G-7Z42KCCLER"
 };
-firebase.initializeApp(firebaseConfig);
