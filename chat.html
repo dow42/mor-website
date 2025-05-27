@@ -1,64 +1,92 @@
-
 <!DOCTYPE html>
 <html lang="as">
 <head>
-  <meta charset="UTF-8">
-  <title>AssamChat - Chat</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-  <script src="firebase-config.js"></script>
+  <meta charset="UTF-8" />
+  <title>Chat Room - Assamese Chat</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #messages { max-height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+    .message { border-bottom: 1px solid #eee; padding: 5px; }
+    .message img { max-width: 100px; max-height: 100px; display: block; margin-top: 5px; }
+  </style>
 </head>
 <body>
-  <h2>AssamChat - চেটিং</h2>
-  <div>
-    <p><strong>ইমেইল:</strong> <span id="userEmail"></span></p>
-    <p><strong>Status:</strong> <span id="userStatus">Online</span></p>
-    <img id="profilePic" src="https://via.placeholder.com/100" alt="Profile Pic" width="100">
-  </div>
-  <hr>
-  <div>
-    <input type="text" id="chatMsg" placeholder="মেচেজ লিখা..." />
-    <button onclick="sendMessage()">পঠিয়াও</button>
-  </div>
-  <ul id="chatBox"></ul>
+  <h2>Assamese Chat Room</h2>
+  <button id="logoutBtn">লগআউট</button>
+  <div id="messages"></div>
 
-  <script>
-    const userEmailSpan = document.getElementById("userEmail");
-    const chatBox = document.getElementById("chatBox");
+  <form id="postForm">
+    <input type="text" id="postText" placeholder="আপোনাৰ বাৰ্তা লিখক" required />
+    <input type="file" id="imageFile" accept="image/*" />
+    <button type="submit">পোস্ট কৰক</button>
+  </form>
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        userEmailSpan.innerText = user.email;
-        listenMessages();
-      } else {
-        window.location.href = "login.html";
-      }
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+    import { firebaseConfig } from "./firebase-config.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => window.location.href = "login.html");
     });
 
-    const db = firebase.database();
+    const messagesDiv = document.getElementById("messages");
+    const postForm = document.getElementById("postForm");
+    const postText = document.getElementById("postText");
+    const imageFile = document.getElementById("imageFile");
 
-    function sendMessage() {
-      const msg = document.getElementById("chatMsg").value;
-      const user = firebase.auth().currentUser;
-      if (msg && user) {
-        db.ref("messages").push({
-          sender: user.email,
-          text: msg,
-          time: Date.now()
-        });
-        document.getElementById("chatMsg").value = "";
-      }
-    }
+    onAuthStateChanged(auth, user => {
+      if (!user) window.location.href = "login.html";
+    });
 
-    function listenMessages() {
-      db.ref("messages").on("child_added", snapshot => {
-        const msg = snapshot.val();
-        const li = document.createElement("li");
-        li.innerText = msg.sender + ": " + msg.text;
-        chatBox.appendChild(li);
+    const messagesRef = collection(db, "messages");
+    const q = query(messagesRef, orderBy("createdAt", "desc"));
+    onSnapshot(q, snapshot => {
+      messagesDiv.innerHTML = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const div = document.createElement("div");
+        div.classList.add("message");
+        div.innerHTML = `<b>${data.email}</b>: ${data.text}`;
+        if (data.imageUrl) {
+          const img = document.createElement("img");
+          img.src = data.imageUrl;
+          div.appendChild(img);
+        }
+        messagesDiv.appendChild(div);
       });
-    }
+    });
+
+    postForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return;
+
+      let imageUrl = "";
+      if (imageFile.files.length > 0) {
+        const file = imageFile.files[0];
+        const storageRef = ref(storage, "images/" + Date.now() + "-" + file.name);
+        await uploadBytes(storageRef, file);
+        imageUrl = await getDownloadURL(storageRef);
+      }
+
+      await addDoc(messagesRef, {
+        text: postText.value,
+        email: user.email,
+        imageUrl,
+        createdAt: serverTimestamp()
+      });
+
+      postText.value = "";
+      imageFile.value = "";
+    });
   </script>
 </body>
 </html>
