@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Friend</title>
+</head>
+<body>
+  <h2>বন্ধু যোগ কৰক</h2>
+
+  <input type="text" id="friendEmail" placeholder="Friend's Email"><br><br>
+  <button onclick="sendRequest()">Send Friend Request</button>
+
+  <p id="msg"></p>
+
+  <script type="module">
+    import { auth, database } from './firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    let currentUserEmail = "";
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUserEmail = user.email.replace(/\./g, "_");
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    function sendRequest() {
+      const friendEmail = document.getElementById("friendEmail").value.replace(/\./g, "_");
+
+      const friendRef = ref(database, `friend_requests//`);
+      set(friendRef, {
+        status: "pending"
+      }).then(() => {
+        document.getElementById("msg").innerText = "Friend request sent!";
+      }).catch((error) => {
+        document.getElementById("msg").innerText = error.message;
+      });
+    }
+
+    window.sendRequest = sendRequest;
+  </script>
+</body>
+</html>
