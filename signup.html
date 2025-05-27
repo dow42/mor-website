@@ -1,31 +1,35 @@
-
 <!DOCTYPE html>
-<html lang="as">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>Sign Up</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="firebase-config.js"></script>
 </head>
 <body>
-  <h2>নতুন একাউণ্ট বনাওক</h2>
-  <input type="email" id="email" placeholder="ইমেইল"><br>
-  <input type="password" id="password" placeholder="পাছৱাৰ্ড"><br>
+  <h2>Sign Up</h2>
+  <input type="email" id="email" placeholder="Email" /><br>
+  <input type="password" id="password" placeholder="Password" /><br>
   <button onclick="signup()">Sign Up</button>
-  <script>
+
+  <p id="message"></p>
+
+  <script type="module">
+    import { auth } from './firebase-config.js';
+    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
     function signup() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-          alert("Signup সফল!");
-          window.location.href = "login.html";
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          document.getElementById("message").innerText = "Sign Up Successful!";
+          window.location.href = "chat.html";
         })
-        .catch(error => {
-          alert("Signup বিফল: " + error.message);
+        .catch((error) => {
+          document.getElementById("message").innerText = error.message;
         });
     }
+
+    window.signup = signup;
   </script>
 </body>
 </html>
