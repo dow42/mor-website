@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Accept Friends</title>
+</head>
+<body>
+  <h2>বন্ধুৰ অনুৰোধ</h2>
+  <div id="requests"></div>
+
+  <script type="module">
+    import { auth, database } from './firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userEmail = user.email.replace(/\./g, "_");
+        const reqRef = ref(database, `friend_requests/`);
+
+        onValue(reqRef, (snapshot) => {
+          const data = snapshot.val();
+          const container = document.getElementById("requests");
+          container.innerHTML = "";
+
+          if (data) {
+            Object.keys(data).forEach(sender => {
+              const div = document.createElement("div");
+              div.innerHTML = `
+                 <button onclick="accept('', '')">Accept</button>
+              `;
+              container.appendChild(div);
+            });
+          } else {
+            container.innerText = "No friend requests.";
+          }
+        });
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    window.accept = function (receiver, sender) {
+      const acceptRef1 = ref(database, `friends//`);
+      const acceptRef2 = ref(database, `friends//`);
+      const removeReq = ref(database, `friend_requests//`);
+
+      set(acceptRef1, { status: "accepted" });
+      set(acceptRef2, { status: "accepted" });
+      set(removeReq, null);
+      alert("Friend added!");
+    }
+  </script>
+</body>
+</html>
