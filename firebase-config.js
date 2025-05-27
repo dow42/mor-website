@@ -1,10 +1,18 @@
 // firebase-config.js
-export const firebaseConfig = {
-  apiKey: "AIzaSyDrbm99CHpokopa79mqcvJga_ZppJ4lujU",
-  authDomain: "assamesechat-8ce9b.firebaseapp.com",
-  projectId: "assamesechat-8ce9b",
-  storageBucket: "assamesechat-8ce9b.appspot.com",
-  messagingSenderId: "1000987239519",
-  appId: "1:1000987239519:web:cfe2845c8f3f066ab427ea",
-  measurementId: "G-7Z42KCCLER"
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAa7jZAcK9mLSlv2ccAV-G11jy-Dj3nxR8",
+  authDomain: "axomiyatchat.firebaseapp.com",
+  projectId: "axomiyatchat",
+  storageBucket: "axomiyatchat.firebasestorage.app",
+  messagingSenderId: "745124651657",
+  appId: "1:745124651657:web:a0c3398b50a133482f9c58",
+  measurementId: "G-S1ZPTCH9WF"
 };
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+export { auth };
