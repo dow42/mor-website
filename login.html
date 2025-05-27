@@ -1,31 +1,37 @@
-
 <!DOCTYPE html>
 <html lang="as">
 <head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="firebase-config.js"></script>
+  <meta charset="UTF-8" />
+  <title>Sign Up - Assamese Chat</title>
 </head>
 <body>
-  <h2>লগ ইন কৰক</h2>
-  <input type="email" id="email" placeholder="ইমেইল"><br>
-  <input type="password" id="password" placeholder="পাছৱাৰ্ড"><br>
-  <button onclick="login()">Login</button>
-  <script>
-    function login() {
+  <h2>নতুন ইউজাৰ চাইন আপ কৰক</h2>
+  <input type="email" id="email" placeholder="ইমেইল দিয়ক" />
+  <input type="password" id="password" placeholder="পাছৱৰ্ড দিয়ক" />
+  <button id="signupBtn">সাইন আপ</button>
+  <p id="status"></p>
+  <p>আগতে সদস্য? <a href="login.html">লগইন কৰক</a></p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+    import { firebaseConfig } from "./firebase-config.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById("signupBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(userCredential => {
-          alert("সফল লগ ইন");
-          window.location.href = "chat.html";
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          document.getElementById("status").textContent = "সাইন আপ সফল! লগইন কৰক।";
+          window.location.href = "login.html";
         })
         .catch(error => {
-          alert("লগ ইন বিফল: " + error.message);
+          document.getElementById("status").textContent = "Error: " + error.message;
         });
-    }
+    });
   </script>
 </body>
 </html>
