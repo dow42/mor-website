@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="as">
+<head>
+  <meta charset="UTF-8">
+  <title>AssamChat - Chat</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  <h2>AssamChat - চেটিং</h2>
+  <div>
+    <p><strong>ইমেইল:</strong> <span id="userEmail"></span></p>
+    <p><strong>Status:</strong> <span id="userStatus">Online</span></p>
+    <img id="profilePic" src="https://via.placeholder.com/100" alt="Profile Pic" width="100">
+  </div>
+  <hr>
+  <div>
+    <input type="text" id="chatMsg" placeholder="মেচেজ লিখা..." />
+    <button onclick="sendMessage()">পঠিয়াও</button>
+  </div>
+  <ul id="chatBox"></ul>
+
+  <script>
+    const userEmailSpan = document.getElementById("userEmail");
+    const chatBox = document.getElementById("chatBox");
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        userEmailSpan.innerText = user.email;
+        listenMessages();
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    const db = firebase.database();
+
+    function sendMessage() {
+      const msg = document.getElementById("chatMsg").value;
+      const user = firebase.auth().currentUser;
+      if (msg && user) {
+        db.ref("messages").push({
+          sender: user.email,
+          text: msg,
+          time: Date.now()
+        });
+        document.getElementById("chatMsg").value = "";
+      }
+    }
+
+    function listenMessages() {
+      db.ref("messages").on("child_added", snapshot => {
+        const msg = snapshot.val();
+        const li = document.createElement("li");
+        li.innerText = msg.sender + ": " + msg.text;
+        chatBox.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
